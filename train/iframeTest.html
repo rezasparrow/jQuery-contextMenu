@@ -22,13 +22,16 @@
 </iframe>
 <script>
     var a = 0;
-    function testClick(event, id, doc , element) {
+    function testClick(event, id, doc, element) {
 
-        console.log("inja");
-        $.contextMenu('destroy', {
-            selector: element,
-            document: doc
-        });
+        console.log("inja---------------------------------------------------" + id);
+        var elements = $('.context-menu-element' , element.ownerDocument);
+        for(var i = 0 ; i < elements.length ; ++i)
+        {
+            $.contextMenu('destroy', {
+                selector: elements[i]
+            });
+        }
         if (a < 1000) {
             ++a;
             var contextMenu = $.contextMenu({
@@ -43,9 +46,11 @@
                         "cut": {name: "Cut", icon: "cut"},
                         "copy": {name: "Copy", icon: "copy"},
                         "paste": {name: "Paste", icon: "paste"},
-                        "delete": {name: "Delete", icon: "delete" , callback:function (key, option) {
-                            console.log("delete*************************************");
-                        }},
+                        "delete": {
+                            name: "Delete", icon: "delete", callback: function (key, option) {
+                                console.log("delete*************************************");
+                            }
+                        },
                         "sep1": "---------",
                         "quit": {
                             name: "Quit", icon: function ($element, key, item) {

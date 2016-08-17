@@ -266,6 +266,7 @@
             },
             // contextmenu show dispatcher
             contextmenu: function (e) {
+                console.log("handle.contextmenu");
                 var $this = $(this);
 
                 // disable actual context-menu if we are using the right mouse button as the trigger
@@ -346,18 +347,20 @@
                         var x = e.pageX;
                         var y = e.pageY;
 
-                        var currentIframe = $currentDocument[0];
-                        while (currentIframe != document) {
-                            var preIFrameDoc = currentIframe;
-                            var win = currentIframe.defaultView || currentIframe.parentWindow;
-                            currentIframe = win.parent.document;
-                            var iFrames = $('iframe', currentIframe);
+                        var currentIFrameDocument = $currentDocument[0];
+                        while (currentIFrameDocument != rootDocument) {
+                            var preIFrameDoc = currentIFrameDocument;
+                            var win = currentIFrameDocument.defaultView || currentIFrameDocument.parentWindow;
+                            currentIFrameDocument = win.parent.document;
+                            var iFrames = $('iframe', currentIFrameDocument);
                             for (var i = 0; i < iFrames.length; ++i) {
                                 var iframe = iFrames[i];
                                 var iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
                                 if (iframeDocument == preIFrameDoc) {
-                                    x += iframe.offsetLeft
-                                    y += iframe.offsetTop;
+                                    var position = $(iframe).position();
+                                    x += position.left
+                                    y += position.top;
+                                    console.log(position);
                                     break;
                                 }
                             }
@@ -458,7 +461,6 @@
             },
             // click on layer to hide contextMenu
             layerClick: function (e) {
-                console.log(e);
                 console.log('handle.layerClick##################################');
                 var $this = $(this),
                     root = $this.data('contextMenuRoot'),
@@ -901,6 +903,7 @@
             },
             // hide <menu>
             hideMenu: function (e, data) {
+                console.log('handle.hideMenu');
                 var root = $(this).data('contextMenuRoot');
                 op.hide.call(root.$trigger, root, data && data.force);
             },
@@ -988,6 +991,9 @@
 
                 // adjust sub-menu zIndexes
                 opt.$menu.find('ul').css('zIndex', css.zIndex + 10);
+
+                var elements = $('.context-menu-element' , $currentDocument[0]);
+                elements.css({'z-index': css.zIndex + 5});
 
                 // position and show context menu
                 opt.$menu.css(css)[opt.animation.show](opt.animation.duration, function () {
@@ -1336,7 +1342,7 @@
                 if (!opt.$node) {
                     opt.$menu.css('display', 'none').addClass('context-menu-root');
                 }
-                opt.$menu.appendTo(opt.appendTo || document.body);
+                opt.$menu.appendTo(opt.appendTo || rootDocument.body);
             },
             resize: function ($menu, nested) {
                 console.log('op.resize')
