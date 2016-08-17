@@ -1554,6 +1554,7 @@
         } else {
             // you never know what they throw at you...
             $context = $(o.context).first();
+
             o.context = $context.get(0);
             _hasContext = o.context !== $currentDocument;
         }
