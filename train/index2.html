@@ -5,17 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>jQuery contextMenu</title>
 
-    <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic'
-          rel='stylesheet' type='text/css'>
+    <link
+        href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic'
+        rel='stylesheet' type='text/css'>
 
     <link rel="stylesheet" href="../documentation/website/css/screen.css" type="text/css"/>
     <link rel="stylesheet" href="../documentation/website/css/theme.css" type="text/css"/>
     <link rel="stylesheet" href="../documentation/website/css/theme-fixes.css" type="text/css"/>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
     <link href="../dist/jquery.contextMenu.css" rel="stylesheet" type="text/css"/>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="../src/jquery.contextMenu.js" type="text/javascript"></script>
+    <script src="../src/jquery.js"></script>
+    <script src="../src/jquery.contextMenu2.js" type="text/javascript"></script>
 
     <script src="../src/jquery.ui.position.js"
             type="text/javascript"></script>
@@ -54,21 +54,28 @@
                              onmousedown="testClick(event , 2 , this)">right click me2</span></p>
                     <h2 id="example-code-simple-context-menu">Example code: Simple Context Menu</h2>
                     <script type="text/javascript" class="showcase">
-                        function testClick(event, id , element) {
+                        function testClick(event, id, element) {
                             console.log("inja" + id);
-                            $.contextMenu('destroy', '.context-menu-one')
+                            $.contextMenu('destroy', element)
                             var options = {
-                                selector: '.context-menu-one',
+                                selector: element,
                                 callback: function (key, options) {
                                     var m = "clicked: " + key;
-                                    console.log("sdsda");
+                                    console.log("sdsda######################");
                                 }
                             };
                             var items = {
                                 "edit": {name: "Edit", icon: "edit"},
                                 "cut": {name: "Cut", icon: "cut"},
                                 "paste": {name: "Paste", icon: "paste"},
-                                "delete": {name: "Delete", icon: "delete"},
+                                "delete": {
+                                    name: "Delete",
+                                    icon: "delete",
+                                    callback: function (key, options) {
+                                        var m = "clicked: " + key;
+                                        console.log("*****************");
+                                    }
+                                },
                                 "sep1": "---------",
                                 "quit": {
                                     name: "Quit", icon: function () {
@@ -97,7 +104,6 @@
 
 </div>
 
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
 
 <script>

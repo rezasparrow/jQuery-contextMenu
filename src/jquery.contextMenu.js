@@ -81,7 +81,6 @@
     }
     /* jshint ignore:end */
 
-    var selector = '';
     var // currently active contextMenu trigger
         $currentTrigger = null,
         // is contextMenu initialized with at least one menu?
@@ -762,7 +761,15 @@
                 root.$selected = opt.$selected = $this;
                 root.isInput = opt.isInput = true;
             },
-            // flag that we're inside an input so the key hal
+            // flag that we're inside an input so the key handler can act accordingly
+            blurInput: function () {
+                var $this = $(this).closest('.context-menu-item'),
+                    data = $this.data(),
+                    opt = data.contextMenu,
+                    root = data.contextMenuRoot;
+
+                root.isInput = opt.isInput = false;
+            },
             // :hover on menu
             menuMouseenter: function () {
                 var root = $(this).data().contextMenuRoot;
@@ -945,11 +952,10 @@
                 }
 
                 // add layer
-                op.layer.call(opt.$menu, opt, 20);
-                $(selector).css('zIndex', 50)
+                op.layer.call(opt.$menu, opt, css.zIndex);
 
                 // adjust sub-menu zIndexes
-                opt.$menu.find('ul').css('zIndex', 21);
+                opt.$menu.find('ul').css('zIndex', css.zIndex+1);
 
                 // position and show context menu
                 opt.$menu.css(css)[opt.animation.show](opt.animation.duration, function () {
@@ -1496,8 +1502,6 @@
 
         // merge with default options
         var o = $.extend(true, {}, defaults, options || {});
-        var doc = document
-        if(!o.document)
         var $document = $(document);
         var $context = $document;
         var _hasContext = false;
@@ -1511,9 +1515,6 @@
             _hasContext = o.context !== document;
         }
 
-        if (o.selector) {
-            selector = o.selector;
-        }
         switch (operation) {
             case 'create':
                 // no selector no joy
@@ -1521,13 +1522,12 @@
                     throw new Error('No selector specified');
                 }
                 // make sure internal classes are not bound to
-                if (typeof o.selector === 'string' && o.selector.match(/.context-menu-(list|item|input)($|\s)/)) {
+                if (o.selector.match(/.context-menu-(list|item|input)($|\s)/)) {
                     throw new Error('Cannot bind to selector "' + o.selector + '" as it contains a reserved className');
                 }
                 if (!o.build && (!o.items || $.isEmptyObject(o.items))) {
                     throw new Error('No Items specified');
                 }
-                selector = o.selector;
                 counter++;
                 o.ns = '.contextMenu' + counter;
                 if (!_hasContext) {

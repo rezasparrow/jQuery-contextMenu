@@ -18,11 +18,11 @@
 <div style="width: 100%; height: 20px">
     <p>inja</p>
 </div>
-<iframe style="width: 100%; height: 300px;" src="index.html">
+<iframe style="width: 100%; height: 400px; margin-left: 20px;" src="index.html">
 </iframe>
 <script>
     var a = 0;
-    function testClick(event, id, doc) {
+    function testClick(event, id, doc , element) {
 
         console.log("inja");
         $.contextMenu('destroy', {
@@ -32,7 +32,7 @@
         if (a < 1000) {
             ++a;
             var contextMenu = $.contextMenu({
-                selector: '.context-menu-one',
+                selector: element,
                 document: doc,
                 build: function ($trigger, e) {
                     // this callback is executed every time the menu is to be shown
@@ -43,7 +43,9 @@
                         "cut": {name: "Cut", icon: "cut"},
                         "copy": {name: "Copy", icon: "copy"},
                         "paste": {name: "Paste", icon: "paste"},
-                        "delete": {name: "Delete", icon: "delete"},
+                        "delete": {name: "Delete", icon: "delete" , callback:function (key, option) {
+                            console.log("delete*************************************");
+                        }},
                         "sep1": "---------",
                         "quit": {
                             name: "Quit", icon: function ($element, key, item) {
