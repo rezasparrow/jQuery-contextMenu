@@ -89,7 +89,17 @@
                             }
 
                             options.items = items;
-                            $.contextMenu(options);
+                            $.contextMenu({
+                                selector:element,
+                                build:function ($triger, e) {
+                                    return{
+                                        items:items,
+                                        callback: function (key, value) {
+                                            console.log('*********************************'+key);
+                                        }
+                                    };
+                                }
+                            });
 
                         }
                         ;

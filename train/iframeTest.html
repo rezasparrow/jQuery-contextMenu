@@ -5,8 +5,8 @@
     <title>Title</title>
 
     <link href="../dist/jquery.contextMenu.css" rel="stylesheet" type="text/css"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="../dist/jquery.contextMenu.js" type="text/javascript"></script>
+    <script src="../src/jquery.js"></script>
+    <script src="../src/jquery.contextMenu2.js" type="text/javascript"></script>
 
     <script src="../dist/jquery.ui.position.js"
             type="text/javascript"></script>
@@ -26,7 +26,7 @@
 
         console.log("inja");
         $.contextMenu('destroy', {
-            selector: '.context-menu-one',
+            selector: element,
             document: doc
         });
         if (a < 1000) {

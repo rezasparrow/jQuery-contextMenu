@@ -364,7 +364,7 @@
                         }
 
                         // show menu
-                        op.show.call($this, e.data, e.pageX, e.pageY);
+                        op.show.call($this, e.data, x, y);
                     }
                 }
             },
@@ -472,6 +472,7 @@
                 e.stopImmediatePropagation();
 
                 setTimeout(function () {
+                    console.log("setTimeOut");
                     var $window;
                     var triggerAction = ((root.trigger === 'left' && button === 0) || (root.trigger === 'right' && button === 2));
 
@@ -860,6 +861,7 @@
             },
             // contextMenu item click
             itemClick: function (e) {
+                console.log("handle.itemClick");
                 var $this = $(this),
                     data = $this.data(),
                     opt = data.contextMenu,
@@ -948,9 +950,11 @@
         // operations
         op = {
             show: function (opt, x, y) {
+                console.log("op.show");
                 var $trigger = $(this),
                     css = {};
 
+                console.log($trigger);
                 // hide any open menus
                 $('#context-menu-layer').trigger('mousedown');
 
@@ -983,7 +987,7 @@
                 op.layer.call(opt.$menu, opt, css.zIndex);
 
                 // adjust sub-menu zIndexes
-                opt.$menu.find('ul').css('zIndex', css.zIndex + 1);
+                opt.$menu.find('ul').css('zIndex', css.zIndex + 10);
 
                 // position and show context menu
                 opt.$menu.css(css)[opt.animation.show](opt.animation.duration, function () {
@@ -995,11 +999,11 @@
                     .addClass('context-menu-active');
 
                 // register key handler
-                $(document).off('keydown.contextMenu').on('keydown.contextMenu', handle.key);
+                $currentDocument.off('keydown.contextMenu').on('keydown.contextMenu', handle.key);
                 // register autoHide handler
                 if (opt.autoHide) {
                     // mouse position handler
-                    $(document).on('mousemove.contextMenuAutoHide', function (e) {
+                    $currentDocument.on('mousemove.contextMenuAutoHide', function (e) {
                         // need to capture the offset on mousemove,
                         // since the page might've been scrolled since activation
                         var pos = $trigger.offset();
@@ -1016,7 +1020,7 @@
                 }
             },
             hide: function (opt, force) {
-                console.log('hide');
+                console.log('op.hide');
                 var $trigger = $(this);
                 if (!opt) {
                     opt = $trigger.data('contextMenu') || {};
@@ -1089,11 +1093,12 @@
                 }
             },
             create: function (opt, root) {
+                console.log("op.create");
                 if (root === undefined) {
                     root = opt;
                 }
                 // create contextMenu
-                opt.$menu = $('<ul class="context-menu-list"></ul>').addClass(opt.className || '').data({
+                opt.$menu = $('<ul class="context-menu-list"></ul>' , rootDocument).addClass(opt.className || '').data({
                     'contextMenu': opt,
                     'contextMenuRoot': root
                 });
@@ -1110,12 +1115,12 @@
                 }
 
                 function createNameNode(item) {
-                    var $name = $('<span></span>');
+                    var $name = $('<span></span>' , rootDocument);
                     if (item._accesskey) {
                         if (item._beforeAccesskey) {
                             $name.append(document.createTextNode(item._beforeAccesskey));
                         }
-                        $('<span></span>')
+                        $('<span></span>' , rootDocument)
                             .addClass('context-menu-accesskey')
                             .text(item._accesskey)
                             .appendTo($name);
@@ -1138,7 +1143,7 @@
 
                 // create contextMenu items
                 $.each(opt.items, function (key, item) {
-                    var $t = $('<li class="context-menu-item"></li>').addClass(item.className || ''),
+                    var $t = $('<li class="context-menu-item"></li>' , rootDocument).addClass(item.className || ''),
                         $label = null,
                         $input = null;
 
@@ -1196,7 +1201,7 @@
                         } else if (item.type === 'html') {
                             $t.addClass('context-menu-html ' + root.classNames.notSelectable);
                         } else if (item.type) {
-                            $label = $('<label></label>').appendTo($t);
+                            $label = $('<label></label>' , rootDocument).appendTo($t);
                             createNameNode(item).appendTo($label);
 
                             $t.addClass('context-menu-input');
@@ -1334,7 +1339,7 @@
                 opt.$menu.appendTo(opt.appendTo || document.body);
             },
             resize: function ($menu, nested) {
-                console.log('resize')
+                console.log('op.resize')
                 var domMenu;
                 // determine widths of submenus, as CSS won't grow them automatically
                 // position:absolute within position:absolute; min-width:100; max-width:200; results in width: 100;
@@ -1371,7 +1376,7 @@
                 }
             },
             update: function (opt, root) {
-                console.log("update");
+                console.log("op.update");
                 var $trigger = this;
                 if (root === undefined) {
                     root = opt;
@@ -1431,7 +1436,7 @@
                 });
             },
             layer: function (opt, zIndex) {
-                console.log('layer');
+                console.log('op.layer');
                 // add transparent layer for click area
                 // filter and background for Internet Explorer, Issue #23
                 var $layer = opt.$layer = $('<div id="context-menu-layer" style="position:fixed; z-index:' + zIndex + '; top:0; left:0; opacity: 0; filter: alpha(opacity=0); background-color: #000;"></div>' , rootDocument)
@@ -1545,7 +1550,7 @@
         var _hasContext = false;
 
         if (!o.context || !o.context.length) {
-            o.context = document;
+            o.context = $currentDocument[0];
         } else {
             // you never know what they throw at you...
             $context = $(o.context).first();
