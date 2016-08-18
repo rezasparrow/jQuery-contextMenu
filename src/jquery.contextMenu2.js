@@ -1611,6 +1611,7 @@
                         }, '.context-menu-list')
                         .on('mouseup.contextMenu', '.context-menu-input', handle.inputClick)
                         .on(contextMenuItemObj, '.context-menu-item');
+                    $
 
                     initialized = true;
                 }

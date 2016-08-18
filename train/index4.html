@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jQuery contextMenu</title>
+
+    <link
+
+
+    <link rel="stylesheet" href="../documentation/website/css/screen.css" type="text/css"/>
+    <link rel="stylesheet" href="../documentation/website/css/theme.css" type="text/css"/>
+    <link rel="stylesheet" href="../documentation/website/css/theme-fixes.css" type="text/css"/>
+    <link href="../dist/jquery.contextMenu.css" rel="stylesheet" type="text/css"/>
+
+    <script src="../src/jquery.js"></script>
+    <script src="../src/jquery.contextMenu.js" type="text/javascript"></script>
+
+    <script src="../src/jquery.ui.position.js"
+            type="text/javascript"></script>
+
+    <script src="../documentation/website/js/main.js" type="text/javascript"></script>
+
+</head>
+<body class="wy-body-for-nav">
+
+<div class="wy-grid-for-nav">
+
+
+    <section data-toggle="wy-nav-shift" style="margin-left: 0px;" class="wy-nav-content-wrap">
+
+        <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+            <a href="https://swisnl.github.io/jQuery-contextMenu/">jQuery contextMenu</a>
+        </nav>
+
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div role="main" class="document">
+                    <h1 id="demo-simple-context-menu">Demo: Simple Context Menu</h1>
+                    <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+                    <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+                    <ul>
+                        <li><a href="#example-code-simple-context-menu">Example code: Simple Context Menu</a></li>
+                        <li><a href="#example-html-simple-context-menu">Example HTML: Simple Context Menu</a></li>
+                        <li><a href="#jquery-context-menu-demo-gallery">jQuery Context Menu Demo Gallery</a></li>
+                    </ul>
+                    <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+                    <p><span class="context-menu-one btn btn-neutral"
+                             onmousedown="testClick(event , 1 ,this)">right click me1</span></p>
+                    <p><span class="context-menu-one btn btn-neutral"
+                             onmousedown="testClick(event , 2 , this)">right click me2</span></p>
+                    <h2 id="example-code-simple-context-menu">Example code: Simple Context Menu</h2>
+                    <script type="text/javascript" class="showcase">
+                        function testClick(event, id, element) {
+                            console.log("inja" + id);
+                            $.contextMenu('destroy', element)
+                            var options = {
+                                selector: '.context-menu-one',
+                                callback: function (key, options) {
+                                    var m = "clicked: " + key;
+                                    console.log("sdsda######################");
+                                }
+                            };
+                            var items = {
+                                "edit": {name: "Edit", icon: "edit"},
+                                "cut": {name: "Cut", icon: "cut"},
+                                "paste": {name: "Paste", icon: "paste"},
+                                "delete": {
+                                    name: "Delete",
+                                    icon: "delete",
+                                    callback: function (key, options) {
+                                        var m = "clicked: " + key;
+                                        console.log("*****************");
+                                    }
+                                },
+                                "sep1": "---------",
+                                "quit": {
+                                    name: "Quit", icon: function () {
+                                        return 'context-menu-icon context-menu-icon-quit';
+                                    }
+                                }
+                            };
+
+                            if (id == 2) {
+                                items.copy = {name: "Copy", icon: "copy"}
+                            }
+
+                            options.items = items;
+                            $.contextMenu({
+                                selector:element,
+                                build:function ($triger, e) {
+                                    return{
+                                        items:items,
+                                        callback: function (key, value) {
+                                            console.log('*********************************'+key);
+                                        }
+                                    };
+                                }
+                            });
+
+                        }
+                        ;
+                    </script>
+                    <h2 id="example-html-simple-context-menu">Example HTML: Simple Context Menu</h2>
+                    <div style="display:none;" class="showcase" data-showcase-import=".context-menu-one"></div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+</div>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+
+<script>
+    $(function () {
+        hljs.configure({
+            tabReplace: '    ', // 4 spaces
+        });
+        hljs.initHighlightingOnLoad();
+    });
+</script>
+
+</body>
+</html>

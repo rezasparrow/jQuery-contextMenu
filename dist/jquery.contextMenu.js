@@ -235,6 +235,7 @@
             // list of contextMenu items
             items: {}
         },
+        rootDocument = document,
         // mouse position for hover activation
         hoveract = {
             timer: null,
@@ -355,8 +356,9 @@
                                 var iframe = iFrames[i];
                                 var iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
                                 if (iframeDocument == preIFrameDoc) {
-                                    x += iframe.offsetLeft
-                                    y += iframe.offsetTop;
+                                    var position = $(iframe).position();
+                                    x += position.left
+                                    y += position.top;
                                     break;
                                 }
                             }
@@ -459,11 +461,11 @@
                 hoveract.timer = null;
             },
             // click on layer to hide contextMenu
-            layerClick: function (e) {
+            layerClick: function (e , data) {
                 console.log(e);
                 console.log('handle.layerClick##################################');
                 var $this = $(this),
-                    root = $this.data('contextMenuRoot'),
+                    root = data,
                     button = e.button,
                     x = e.pageX,
                     y = e.pageY,
@@ -479,10 +481,10 @@
                     var triggerAction = ((root.trigger === 'left' && button === 0) || (root.trigger === 'right' && button === 2));
 
                     // find the element that would've been clicked, wasn't the layer in the way
-                    if (document.elementFromPoint && root.$layer) {
+                    if ($currentDocument[0].elementFromPoint && root.$layer) {
                         for (var i = 0; i < root.$layer.length; ++i) {
                             root.$layer[i].hide();
-                            target = document.elementFromPoint(x - $win.scrollLeft(), y - $win.scrollTop());
+                            target = $currentDocument[0].elementFromPoint(x - $win.scrollLeft(), y - $win.scrollTop());
                             root.$layer[i].show();
                         }
                     }
@@ -973,6 +975,8 @@
                 opt.$selected = null;
             }
         },
+        // op data
+        opData = undefined,
         // operations
         op = {
             show: function (opt, x, y) {
@@ -1025,7 +1029,7 @@
                     .addClass('context-menu-active');
 
                 // register key handler
-                $(document).off('keydown.contextMenu').on('keydown.contextMenu', handle.key);
+                $(rootDocument).off('keydown.contextMenu').on('keydown.contextMenu', handle.key);
                 // register autoHide handler
                 if (opt.autoHide) {
                     // mouse position handler
@@ -1045,6 +1049,13 @@
                             }, 50);
                         }
                     });
+                }
+                var menuUI = $('.context-menu-item', rootDocument);
+                console.log(menuUI);
+                for (var i = 0; i < menuUI.length; ++i) {
+                    menuUI[i].addEventListener('click', function () {
+                        alert("click");
+                    }, false );
                 }
             },
             hide: function (opt, force) {
@@ -1071,8 +1082,9 @@
                             var allElement = $layer;
                             for (var i = 0; i < allElement.length; ++i) {
                                 allElement[i]
-                                    .off('contextmenu', handle.abortevent)
-                                    .off('mousedown', handle.layerClick);
+                                    .off('contextmenu', handle.abortevent);
+                                allElement[i][0].body
+                                    .removeEventListener('mousedown', allElement[i].mouseDownHandler);
                                 // $layer.remove();
 
                             }
@@ -1135,7 +1147,7 @@
 
                 var currentDoc = $currentDocument[0];
                 // create contextMenu
-                opt.$menu = $('<ul class="context-menu-list"></ul>', currentDoc).addClass(opt.className || '').data({
+                opt.$menu = $('<ul class="context-menu-list"></ul>', root).addClass(opt.className || '').data({
                     'contextMenu': opt,
                     'contextMenuRoot': root
                 });
@@ -1152,12 +1164,12 @@
                 }
 
                 function createNameNode(item) {
-                    var $name = $('<span></span>', currentDoc);
+                    var $name = $('<span></span>', rootDocument);
                     if (item._accesskey) {
                         if (item._beforeAccesskey) {
                             $name.append(currentDoc.createTextNode(item._beforeAccesskey));
                         }
-                        $('<span></span>')
+                        $('<span></span>',rootDocument)
                             .addClass('context-menu-accesskey')
                             .text(item._accesskey)
                             .appendTo($name);
@@ -1373,7 +1385,7 @@
                 if (!opt.$node) {
                     opt.$menu.css('display', 'none').addClass('context-menu-root');
                 }
-                opt.$menu.appendTo(opt.appendTo || document.body);
+                opt.$menu.appendTo(opt.appendTo || rootDocument.body);
             },
             resize: function ($menu, nested) {
                 console.log('resize')
@@ -1489,12 +1501,20 @@
                     rootDoc = $(win.parent.document);
                 } while (rootDoc[0] != preRootDoc[0])
                 for (var i = 0; i < allElements.length; ++i) {
-                    allElements[i].removeClass('context-menu-layer-for-show');
-                    allElements[i].addClass(' context-menu-layer-for-show');
-                    allElements[i]
+                    allElements[i].removeClass('context-menu-layer-for-show')
+                        .addClass(' context-menu-layer-for-show')
                         .data('contextMenuRoot', opt)
-                        .on('contextmenu', handle.abortevent)
-                        .on('mousedown', handle.layerClick);
+                        .on('contextmenu', handle.abortevent);
+                    var mouseDownHandler = function (event) {
+                        handle.layerClick(event , opt)
+                    };
+                    allElements[i].mouseDownHandler = mouseDownHandler;
+
+                        allElements[i][0].body
+                            .addEventListener('mousedown',mouseDownHandler,false);
+
+
+                    opData = opt;
                 }
 
                 var $layer = opt.$layer = allElements;
@@ -1579,11 +1599,22 @@
 
         // merge with default options
         var o = $.extend(true, {}, defaults, options || {});
-        var doc = document;
-        if (o.document) {
-            doc = o.document;
+        var $document = $(document);
+        if (o.selector) {
+            $document = $(o.selector.ownerDocument);
         }
-        $currentDocument = $(doc);
+
+        $currentDocument = $document;
+        rootDocument = $document[0];
+        var preDocument = rootDocument;
+
+        do {
+            var doc = rootDocument;
+            var win = doc.defaultView || doc.parentWindow;
+            preDocument = rootDocument;
+            rootDocument = $(win.parent.document)[0];
+        } while (rootDocument != preDocument)
+
         var $context = $currentDocument;
         var _hasContext = false;
 
@@ -1638,8 +1669,8 @@
                     var currentListenerDocument = $currentDocument;
                     var preListenerDoc = currentListenerDocument;
                     var isFirst = true;
-                    do {
-                        currentListenerDocument
+                    // do {
+                        $(rootDocument)
                             .on({
                                 'contextmenu:hide.contextMenu': handle.hideMenu,
                                 'prevcommand.contextMenu': handle.prevItem,
@@ -1652,12 +1683,14 @@
                             .on(contextMenuItemObj, '.context-menu-item');
                         preListenerDoc = currentListenerDocument;
 
+
+
                         var doc = currentListenerDocument[0];
                         // Assume that element exists, otherwise an error will be thrown at the next line
                         var win = doc.defaultView || doc.parentWindow;
 
                         currentListenerDocument = $(win.parent.document);
-                    } while (preListenerDoc[0] != currentListenerDocument[0])
+                    // } while (preListenerDoc[0] != currentListenerDocument[0])
                     initialized = true;
                 }
 
@@ -2059,3 +2092,29 @@
 
 
 });
+
+
+var contextMenu = function (element, items, option) {
+    console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@")
+    if (!element) {
+        throw new Error('No selector specified');
+    }
+    if (!option) {
+        option = {};
+    }
+
+    option.items = items;
+    var elements = $('.context-menu-element', element.ownerDocument);
+    for (var i = 0; i < elements.length; ++i) {
+        $.contextMenu('destroy', {
+            selector: elements[i]
+        });
+    }
+    $.contextMenu({
+        selector: element,
+        build: function ($target, e) {
+            return option;
+        }
+    });
+
+}

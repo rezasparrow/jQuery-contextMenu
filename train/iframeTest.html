@@ -6,7 +6,7 @@
 
     <link href="../dist/jquery.contextMenu.css" rel="stylesheet" type="text/css"/>
     <script src="../src/jquery.js"></script>
-    <script src="../src/jquery.contextMenu2.js" type="text/javascript"></script>
+    <script src="../dist/jquery.contextMenu.js" type="text/javascript"></script>
 
     <script src="../dist/jquery.ui.position.js"
             type="text/javascript"></script>
@@ -25,56 +25,29 @@
     function testClick(event, id, doc, element) {
 
         console.log("inja---------------------------------------------------" + id);
-        var elements = $('.context-menu-element' , element.ownerDocument);
-        for(var i = 0 ; i < elements.length ; ++i)
-        {
-            $.contextMenu('destroy', {
-                selector: elements[i]
-            });
-        }
-        if (a < 1000) {
-            ++a;
-            var contextMenu = $.contextMenu({
-                selector: element,
-                document: doc,
-                build: function ($trigger, e) {
-                    // this callback is executed every time the menu is to be shown
-                    // its results are destroyed every time the menu is hidden
-                    // e is the original contextmenu event, containing e.pageX and e.pageY (amongst other data)
-                    var items = {
-                        "edit": {name: "Edit", icon: "edit"},
-                        "cut": {name: "Cut", icon: "cut"},
-                        "copy": {name: "Copy", icon: "copy"},
-                        "paste": {name: "Paste", icon: "paste"},
-                        "delete": {
-                            name: "Delete", icon: "delete", callback: function (key, option) {
-                                console.log("delete*************************************");
-                            }
-                        },
-                        "sep1": "---------",
-                        "quit": {
-                            name: "Quit", icon: function ($element, key, item) {
-                                return 'context-menu-icon context-menu-icon-quit';
-                            }
-                        }
-                    };
-
-                    if (id == 2) {
-                        items.test = {name: "test", icon: "test"}
-                    }
-                    return {
-                        callback: function (key, options) {
-                            var m = "clicked: " + key;
-                            window.console && console.log(m) || alert(m);
-                        },
-                        items: items
-                    };
+        var items = {
+            "edit": {name: "Edit", icon: "edit"},
+            "cut": {name: "Cut", icon: "cut"},
+            "copy": {name: "Copy", icon: "copy"},
+            "paste": {name: "Paste", icon: "paste"},
+            "delete": {
+                name: "Delete", icon: "delete", callback: function (key, option) {
+                    console.log("delete*************************************");
+                    alert("delete***************************************");
                 }
-            });
-            console.log(contextMenu);
-//                                contextMenu.handle.layerClick(event);
+            },
+            "sep1": "---------",
+            "quit": {
+                name: "Quit", icon: function ($element, key, item) {
+                    return 'context-menu-icon context-menu-icon-quit';
+                }
+            }
+        };
+
+        if (id == 2) {
+            items.test = {name: "test", icon: "test"}
         }
-        console.log(event);
+        contextMenu(element, items);
 
     }
 
